@@ -1,63 +1,62 @@
-# Astro Starter Kit: Blog
+# Blog Service
 
-```sh
-npm create astro@latest -- --template blog
+这个目录是 `blog.example.cn` 的 Astro 博客项目。
+
+## Position In Workspace
+
+在当前架构里，这个博客已经纳入 `E:\aliyun` 根目录统一编排：
+
+- 根目录 [docker-compose.yml](E:/aliyun/docker-compose.yml) 负责统一启动 `gateway + blog`
+- 根目录 `gateway` 负责公网 `80/443` 入口
+- 本目录只负责博客应用自身的构建、内容和容器镜像
+
+## Recommended Usage
+
+### Local Astro development
+
+```powershell
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+适合日常写文章、调样式、做页面开发。
 
-Features:
+### Local container validation
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+```powershell
+docker compose up -d --build
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+这里调用的是本目录自己的 [docker-compose.yml](E:/aliyun/blog/docker-compose.yml)，会把博客直接映射到本机 `8080`，适合单独验证镜像是否正常。
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### Unified production-style run
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+请在根目录执行：
 
-Any static assets, like images, can be placed in the `public/` directory.
+```powershell
+cd E:\aliyun
+docker compose up -d --build
+```
 
-## 🧞 Commands
+这是当前推荐的正式部署方式。
 
-All commands are run from the root of the project, from a terminal:
+## Files In This Directory
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- [Dockerfile](E:/aliyun/blog/Dockerfile)
+  - 构建 Astro 静态站点并交给容器内 Nginx 提供服务
+- [nginx/default.conf](E:/aliyun/blog/nginx/default.conf)
+  - 博客容器内部静态站点配置
+- [docker-compose.yml](E:/aliyun/blog/docker-compose.yml)
+  - 单项目本地容器验证用
+- [docker-compose.prod.yml](E:/aliyun/blog/docker-compose.prod.yml)
+  - 早期“博客自带 gateway”的方案，建议仅保留作参考
+- [DEPLOY_ALIBABA_CLOUD_LINUX.md](E:/aliyun/blog/DEPLOY_ALIBABA_CLOUD_LINUX.md)
+  - 旧版单项目部署说明，后续建议逐步迁移为根目录统一说明
 
-## 👀 Want to learn more?
+## Suggested Cleanup Later
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+后续架构稳定后，可以考虑：
 
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+1. 删除 `blog/docker-compose.prod.yml`
+2. 删除 `blog/deploy/nginx/conf.d/blog.conf.template`
+3. 重写 `DEPLOY_ALIBABA_CLOUD_LINUX.md`，改为引用根目录部署文档
